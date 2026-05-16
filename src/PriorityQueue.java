@@ -6,11 +6,11 @@ import java.util.ArrayList;
  * mean "higher" priority.
  *
  * @param <E> the type of elements in the queue
- * @author
+ * @author Alex
  */
 public class PriorityQueue<E extends Comparable<E>> {
 
-    private ArrayList<E> myHeap; //array representation of the heap
+    private ArrayList<E> myHeap; // array representation of the heap
 
     /**
      * Creates an empty Priority Queue
@@ -26,6 +26,24 @@ public class PriorityQueue<E extends Comparable<E>> {
      */
     public void add(E element) {
 
+        myHeap.add(element);
+
+        int current = myHeap.size() - 1;
+
+        // sift up
+        while (current > 0) {
+
+            int parent = (current - 1) / 2;
+
+            if (myHeap.get(current).compareTo(myHeap.get(parent)) < 0) {
+
+                swap(current, parent);
+                current = parent;
+
+            } else {
+                break;
+            }
+        }
     }
 
     /**
@@ -37,6 +55,10 @@ public class PriorityQueue<E extends Comparable<E>> {
      */
     private void swap(int posOne, int posTwo) {
 
+        E temp = myHeap.get(posOne);
+
+        myHeap.set(posOne, myHeap.get(posTwo));
+        myHeap.set(posTwo, temp);
     }
 
     /**
@@ -46,7 +68,8 @@ public class PriorityQueue<E extends Comparable<E>> {
      * @return true if the element is in the queue, false otherwise
      */
     public boolean contains(E element) {
-        return false;
+
+        return myHeap.contains(element);
     }
 
     /**
@@ -56,7 +79,12 @@ public class PriorityQueue<E extends Comparable<E>> {
      * @return the element of highest priority queue
      */
     public E peek() {
-        return null;
+
+        if (myHeap.isEmpty()) {
+            return null;
+        }
+
+        return myHeap.get(0);
     }
 
     /**
@@ -66,7 +94,24 @@ public class PriorityQueue<E extends Comparable<E>> {
      * @return the element of highest priority
      */
     public E poll() {
-        return null;
+
+        if (myHeap.isEmpty()) {
+            return null;
+        }
+
+        E removed = myHeap.get(0);
+
+        // move last element to root
+        E last = myHeap.remove(myHeap.size() - 1);
+
+        if (!myHeap.isEmpty()) {
+
+            myHeap.set(0, last);
+
+            heapify(0);
+        }
+
+        return removed;
     }
 
     /**
@@ -77,6 +122,32 @@ public class PriorityQueue<E extends Comparable<E>> {
      */
     private void heapify(int pos) {
 
+        int smallest = pos;
+
+        int left = 2 * pos + 1;
+        int right = 2 * pos + 2;
+
+        // check left child
+        if (left < myHeap.size()
+                && myHeap.get(left).compareTo(myHeap.get(smallest)) < 0) {
+
+            smallest = left;
+        }
+
+        // check right child
+        if (right < myHeap.size()
+                && myHeap.get(right).compareTo(myHeap.get(smallest)) < 0) {
+
+            smallest = right;
+        }
+
+        // swap and continue heapifying
+        if (smallest != pos) {
+
+            swap(pos, smallest);
+
+            heapify(smallest);
+        }
     }
 
     /**
@@ -88,7 +159,30 @@ public class PriorityQueue<E extends Comparable<E>> {
      * @return true if an element was removed from the queue, false otherwise
      */
     public boolean remove(E element) {
-        return false;
+
+        int index = myHeap.indexOf(element);
+
+        if (index == -1) {
+            return false;
+        }
+
+        // if removing last element
+        if (index == myHeap.size() - 1) {
+
+            myHeap.remove(myHeap.size() - 1);
+
+            return true;
+        }
+
+        // move last element into removed spot
+        E last = myHeap.remove(myHeap.size() - 1);
+
+        myHeap.set(index, last);
+
+        // restore heap
+        heapify(index);
+
+        return true;
     }
 
     /**
@@ -97,7 +191,8 @@ public class PriorityQueue<E extends Comparable<E>> {
      * @return the number of elements in the queue
      */
     public int size() {
-        return -1;
+
+        return myHeap.size();
     }
 
     /**
@@ -108,9 +203,20 @@ public class PriorityQueue<E extends Comparable<E>> {
      * @return the String representation of the heap
      */
     public String toString() {
-        return "toString";
-    }
 
+        String result = "";
+
+        for (int i = 0; i < myHeap.size(); i++) {
+
+            result += myHeap.get(i);
+
+            if (i < myHeap.size() - 1) {
+                result += " ";
+            }
+        }
+
+        return result;
+    }
 
     /**
      * Main method - contains console program used
@@ -119,8 +225,24 @@ public class PriorityQueue<E extends Comparable<E>> {
      * @param args
      */
     public static void main(String[] args) {
-// TODO Auto-generated method stub
 
+        PriorityQueue<Integer> pq = new PriorityQueue<Integer>();
+
+        pq.add(5);
+        pq.add(2);
+        pq.add(8);
+        pq.add(1);
+
+        System.out.println(pq);
+
+        System.out.println("Peek: " + pq.peek());
+
+        System.out.println("Poll: " + pq.poll());
+
+        System.out.println(pq);
+
+        pq.remove(5);
+
+        System.out.println(pq);
     }
-
 }
